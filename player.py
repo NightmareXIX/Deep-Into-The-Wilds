@@ -76,8 +76,12 @@ class Player(pygame.sprite.Sprite):
 
     def dead(self):
         if self.health <= 0:
+            self.health = 100
             return True
         return False
+
+    def player_reset(self):
+        self.rect.midbottom = (70, 500)
 
     def update(self):
         self.walk()
