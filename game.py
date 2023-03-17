@@ -231,6 +231,17 @@ def end_game():
     exit()
 
 
+def game_reset():
+    global enemy_list
+    player.player_reset()
+    for sprite in enemy_list:
+        sprite.kill()
+    enemy_group.empty()
+    fly_bullet_group.empty()
+    bullet_group.empty()
+    enemy_list = []
+
+
 # Initialize pygame
 pygame.init()
 screen = pygame.display.set_mode((1000, 650))
@@ -278,6 +289,10 @@ back = font_style.render('BACK', False, (77, 126, 191))
 back_rect = back.get_rect(center=(500, 500))
 ins_bool = False
 
+# Replay
+replay = font_style.render('PLAY AGAIN', False, (77, 126, 191))
+replay_rect = replay.get_rect(center=(500, 500))
+
 # Camera
 camera_group = CameraGroup()
 
@@ -305,10 +320,10 @@ fly_bullet_group = pygame.sprite.Group()
 
 # User events
 snail_timer = pygame.USEREVENT + 1
-pygame.time.set_timer(snail_timer, 2000)
+pygame.time.set_timer(snail_timer, 4000)
 
 fly_timer = pygame.USEREVENT + 2
-pygame.time.set_timer(fly_timer, 3000)
+pygame.time.set_timer(fly_timer, 5000)
 
 fly_height_timer = pygame.USEREVENT + 3
 pygame.time.set_timer(fly_height_timer, 200)
@@ -317,7 +332,7 @@ fly_shoot_timer = pygame.USEREVENT + 4
 pygame.time.set_timer(fly_shoot_timer, 2000)
 
 next_level = pygame.USEREVENT + 5
-pygame.time.set_timer(next_level, 12000)
+pygame.time.set_timer(next_level, 15000)
 
 while True:
     # Events
@@ -369,7 +384,10 @@ while True:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if play_rect.collidepoint(event.pos):
                     game_end = False
-                if ins_rect.collidepoint(event.pos):
+                if replay_rect.collidepoint(event.pos):
+                    kill_count = 0
+                    game_end = False
+                elif ins_rect.collidepoint(event.pos):
                     ins_bool = True
                 if back_rect.collidepoint(event.pos):
                     ins_bool = False
@@ -402,6 +420,9 @@ while True:
         # game end
         game_end = player.dead()
     else:
+        # Reset Values
+        game_reset()
+
         # Music
         game_music.stop()
         intro_music.play()
@@ -421,6 +442,10 @@ while True:
                 kills = font_style.render(f'POINTS : {kill_count}', False, (200, 221, 250))
                 kills_rect = kills.get_rect(center=(500, 375))
                 screen.blit(kills, kills_rect)
+
+                # Replay button
+                pygame.draw.rect(screen, (200, 221, 250), pygame.transform.rotozoom(replay, 0, 1.4).get_rect(center=(500, 500)), border_radius=5)
+                screen.blit(replay, replay_rect)
             else:
                 screen.blit(game_title, game_title_rect)
                 pygame.draw.rect(screen, (200, 221, 250), pygame.transform.rotozoom(play, 0, 1.4).get_rect(center=(500, 325)), border_radius=5)
