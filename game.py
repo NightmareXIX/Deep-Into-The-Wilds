@@ -293,6 +293,9 @@ ins_bool = False
 replay = font_style.render('PLAY AGAIN', False, (77, 126, 191))
 replay_rect = replay.get_rect(center=(500, 500))
 
+# Button list
+button_list = ['play', 'ins']
+
 # Camera
 camera_group = CameraGroup()
 
@@ -382,17 +385,22 @@ while True:
                 snail_limit += 2
         else:
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if play_rect.collidepoint(event.pos):
+                if play_rect.collidepoint(event.pos) and 'play' in button_list:
                     game_end = False
-                if replay_rect.collidepoint(event.pos):
+                    button_list = ['replay']
+                elif replay_rect.collidepoint(event.pos) and 'replay' in button_list:
+                    game_end = False
                     kill_count = 0
-                    game_end = False
-                elif ins_rect.collidepoint(event.pos):
+                elif ins_rect.collidepoint(event.pos) and 'ins' in button_list:
+                    game_end = True
                     ins_bool = True
-                if back_rect.collidepoint(event.pos):
+                    button_list = ['back']
+                elif back_rect.collidepoint(event.pos) and 'back' in button_list:
+                    game_end = True
                     ins_bool = False
+                    button_list = ['play', 'ins']
 
-    if not game_end:
+    if not game_end and not ins_bool:
         intro_music.stop()
         game_music.play()
         # Camera
