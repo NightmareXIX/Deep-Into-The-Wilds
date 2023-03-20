@@ -54,8 +54,8 @@ class Player(pygame.sprite.Sprite):
         return self.rect
 
     def boundary(self):
-        if self.rect.left <= 38:
-            self.rect.left = 38
+        if self.rect.left <= 200:
+            self.rect.left = 200
         if self.rect.right >= 3500:
             self.rect.right = 3500
 
@@ -81,10 +81,9 @@ class Player(pygame.sprite.Sprite):
         return False
 
     def player_reset(self):
-        self.rect.midbottom = (70, 500)
+        self.rect.midbottom = (300, 500)
 
     def update(self):
         self.walk()
         self.apply_gravity()
         self.boundary()
-
