@@ -6,7 +6,7 @@ from player import *
 
 
 # Enemy
-class Snail(pygame.sprite.Sprite):
+class Snail(pygame.sprite.Sprite): 
     def __init__(self, pos, group):
         super().__init__(group)
         snail_1 = pygame.image.load('graphics/snail/snail1.png').convert_alpha()
@@ -20,7 +20,7 @@ class Snail(pygame.sprite.Sprite):
 
         self.image = self.frames[self.animation_index]
         self.rect = self.image.get_rect(midbottom=pos)
-        self.health = 50
+        self.health = 70
         self.direction = -4
 
     def collision(self, bullets, obstacles):
@@ -68,7 +68,7 @@ class Fly(pygame.sprite.Sprite):
 
         self.image = self.frames[self.animation_idx]
         self.rect = self.image.get_rect(midbottom=pos)
-        self.health = 30
+        self.health = 40
         self.direction = -4
 
         # Fly bullet
@@ -139,7 +139,8 @@ class Bullet(pygame.sprite.Sprite):
             self.rect.x += 10
 
     def destroy(self, bool):
-        if abs(self.rect.x - self.start.x) > 1100 or bool:
+        if abs(self.rect.x - self.start.x) > 700 or bool:
+            print('destroyed')
             self.kill()
 
     def update(self):
@@ -186,7 +187,7 @@ class CameraGroup(pygame.sprite.Group):
         self.offset = pygame.math.Vector2()
 
         # Box camera
-        self.camera_borders = {'left' : 150, 'right' : 150, 'top' : 100, 'bottom' : 100}
+        self.camera_borders = {'left' : 300, 'right' : 250, 'top' : 300, 'bottom' : 100}
         l = self.camera_borders['left']
         t = self.camera_borders['top']
         w = self.display_surf.get_size()[0] - self.camera_borders['right'] - self.camera_borders['left']
@@ -312,8 +313,8 @@ enemy_list = []
 snail_count = 0
 fly_counter = 0
 
-snail_limit = 3
-fly_limit = 2
+snail_limit = 2
+fly_limit = 1
 
 kill_count = 0
 
@@ -322,20 +323,23 @@ bullet_group = pygame.sprite.Group()
 fly_bullet_group = pygame.sprite.Group()
 
 # User events
+snail_generate = 3000
+fly_generate = 6000
+
 snail_timer = pygame.USEREVENT + 1
-pygame.time.set_timer(snail_timer, 4000)
+pygame.time.set_timer(snail_timer, snail_generate)
 
 fly_timer = pygame.USEREVENT + 2
-pygame.time.set_timer(fly_timer, 5000)
+pygame.time.set_timer(fly_timer, fly_generate)
 
 fly_height_timer = pygame.USEREVENT + 3
 pygame.time.set_timer(fly_height_timer, 200)
 
 fly_shoot_timer = pygame.USEREVENT + 4
-pygame.time.set_timer(fly_shoot_timer, 2000)
+pygame.time.set_timer(fly_shoot_timer, 3000)
 
 next_level = pygame.USEREVENT + 5
-pygame.time.set_timer(next_level, 15000)
+pygame.time.set_timer(next_level, 20000)
 
 while True:
     # Events
@@ -355,32 +359,26 @@ while True:
                 bullet_group.add(bullet)
                 pygame.mixer.Channel(0).play(gun_sound)
 
-            if event.type == snail_timer:
-                player_x = player.player_rect().x
-                distance = abs(player_x - randint(player_x - 1000, player_x + 1000))
-                if distance <= 400 and snail_count < snail_limit:
-                    x = choice([(1000, 1500), (-1500, -1000)])
-                    snail = Snail((randint(player.player_rect().x + x[0], player.player_rect().x + x[1]), 500), camera_group)
-                    enemy_group.add(snail)
-                    enemy_list.append(snail)
-                    snail_count += 1
+            if event.type == snail_timer and snail_count < snail_limit:
+                x = choice([(1000, 1500), (-1500, -1000)])
+                snail = Snail((randint(player.player_rect().x + x[0], player.player_rect().x + x[1]), 500), camera_group)
+                enemy_group.add(snail)
+                enemy_list.append(snail)
+                snail_count += 1
 
             if event.type == fly_timer and fly_counter < fly_limit:
-                player_x = player.player_rect().x
-                distance = abs(player_x - randint(player_x - 1500, player_x + 1500))
-                if distance <= 300:
-                    x = choice([(1000, 2000), (-2000, -1000)])
-                    fly = Fly((randint(player.player_rect().x + x[0], player.player_rect().x + x[1]), 300), camera_group)
-                    enemy_group.add(fly)
-                    enemy_list.append(fly)
-                    fly_counter += 1
+                x = choice([(1000, 2000), (-2000, -1000)])
+                fly = Fly((randint(player.player_rect().x + x[0], player.player_rect().x + x[1]), 300), camera_group)
+                enemy_group.add(fly)
+                enemy_list.append(fly)
+                fly_counter += 1
 
             if event.type == fly_height_timer and fly_counter > 0:
                 fly.flight_height()
             if event.type == fly_shoot_timer and fly_counter > 0:
                 fly.shoot(player.player_rect())
 
-            if event.type == next_level:
+            if event.type == next_level or kill_count % 5 == 0:
                 fly_limit += 1
                 snail_limit += 2
         else:
