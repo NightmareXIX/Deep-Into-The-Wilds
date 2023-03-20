@@ -1,4 +1,4 @@
-# YOUR PROJECT TITLE
+# DEEP INTO THE WILDS
 #### Video Demo:  <URL HERE>
 #### Description:
 My final project is a 2d side-scroller/shooting game that is made with the pygame module of python. The name of my game is ***Deep Into The Wilds***.
